@@ -9,7 +9,7 @@ const connection = mysql.createConnection({
     host: 'localhost',
     port: 3306,
     user: 'root',
-    password: '',
+    password: 'Tdragon9!',
     database: 'employees_db'
 });
 
@@ -27,7 +27,7 @@ const start = () => {
             message: "What would you like to do?",
             choices: [
             "View All Employees", "View All Employees By Department", 
-            "View All Employees By Manager", "Add Employee", "Remove Employee", 
+            "View All Employees By Manager", "Add Employee", "Add Department", "Add Role", "Remove Employee", 
             "Update Employee Role", "Update Employee Manager"]
         })
         .then((answer) => {
@@ -46,6 +46,14 @@ const start = () => {
 
                 case "Add Employee":
                     addEmployee();
+                    break;
+
+                case "Add Department":
+                    addDepartment();
+                    break;
+                
+                case "Add Role":
+                    addRole();
                     break;
 
                 case "Remove Employee":
@@ -71,15 +79,32 @@ const start = () => {
 
 // Need console.table for view all
 const viewAll = () => {
-
+    const query =
+    'SELECT * FROM employee';
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+    });
+console.log('this is view all');
+start();
 };
 
 const byDep = () => {
-    console.log('this is byDep');
+    inquirer  
+        .prompt({
+            name: "department",
+            type: "list",
+            message: "What department are you looking for?",
+            choices: ["Sales", "Engineering", "Finance", "Legal"]
+        }).then((answer) => {
+            
+        });
+    start();
 };
 
 const byMngr = () => {
-    console.log('this is byMngr');
+    getManagers();
+    start();
 };
 
 const addEmployee = () => {
@@ -112,12 +137,59 @@ const addEmployee = () => {
         })
 };
 
-// Get employees 
+const addDepartment = () => {
+    
+};
+
+const addRole = () => {
+    inquirer
+        .prompt({
+            name: "role",
+            type: "input",
+            message: "What is the title of this role?"
+        },
+        {
+            name: "salary",
+            type: "number",
+            message: "What is the salary for this role?"
+        },
+        {
+            name: "department",
+            type: "input",
+            message: "What is the department for this role?"
+        }).then((answers) => {
+            let newRole = {
+                title: answers.role,
+                salary: answers.salary,
+                department: answers.department
+            };
+            const query = 'INSTER INTO role (title, salary, department_id) VALUES (?, ?, ?)';
+            connection.query(query, [ newRole.title, newRole.salary, newRole.department ], (res, err) => {
+                if (err) throw err;
+                console.log("New role added!");
+                console.log(res);
+            });
+        });
+};
+
+
+const getManagers = () => {
+    return new Promise((resolve, reject) => {
+        connection.query(`SELECT CONCAT (b.first_name, " ", b.last_name) AS Name 
+        FROM employee a LEFT JOIN employee b
+        ON a.manager_id = b.id
+        WHERE a.manager_id IS NOT NULL;`, (err,res) => {
+            if (err) reject(err);
+            resolve(res);
+            console.table(res);
+        });
+    });
+};
+
 const getEmployees = () => {
-    return new Promise((res, rej) => {
-        connection.query(`SELECT CONCAT ()`)
-    })
+
 }
+
 const remEmployee = async () => {
     let choices = await employees_db.getEmployees();
     console.log(choices);
