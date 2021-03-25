@@ -224,14 +224,15 @@ const upEmployee = () => {
 };
 
 const upMngr = () => {
-    inquirer
-    .prompt({
-        name: "updateManager",
-        type: "list",
-        message: "Which manager do you want to update?",
-        // Need to get employees for choices
-        choices: []
-    })
+    
+    // inquirer
+    // .prompt({
+    //     name: "updateManager",
+    //     type: "list",
+    //     message: "Which manager do you want to update?",
+    //     // Need to get employees for choices
+    //     choices: []
+    // })
     console.log('this is upMngr');
 };
 
