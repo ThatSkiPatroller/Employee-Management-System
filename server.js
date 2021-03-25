@@ -9,7 +9,7 @@ const connection = mysql.createConnection({
     host: 'localhost',
     port: 3306,
     user: 'root',
-    password: 'Tdragon9!',
+    password: '',
     database: 'employees_db'
 });
 
@@ -71,12 +71,7 @@ const start = () => {
 
 // Need console.table for view all
 const viewAll = () => {
-    // const query =
-    //     'SELECT * FROM employees_db';
-    //     connection.query(query, (err, res) => {
-    //         res.console.table([{}])
-    //     });
-    console.log('this is view all');
+
 };
 
 const byDep = () => {
