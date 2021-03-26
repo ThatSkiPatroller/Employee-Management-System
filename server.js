@@ -138,7 +138,20 @@ const addEmployee = () => {
 };
 
 const addDepartment = () => {
-    
+    inquirer
+        .prompt([
+            {
+                name: "department",
+                type: "input",
+                message: "What is the name of the department you would like to add?"
+            }
+        ]).then((answer) => {
+            const query = 'INSERT INTO department (name) VALUES (?)';
+            connection.query(query, [answer.department], (res, err) => {
+                console.log("New department added!");
+            });
+            start();
+        });
 };
 
 const addRole = () => {
@@ -149,27 +162,27 @@ const addRole = () => {
     
     inquirer
         .prompt([
-        {
-            name: "role",
-            type: "input",
-            message: "What is the title of this role?"
-        },
-        {
-            name: "salary",
-            type: "number",
-            message: "What is the salary for this role?"
-        },
-        {
-            name: "department",
-            type: "rawlist",
-            message: "What is the department for this role?",
-            choices () {
-                const choiceArray = [];
-                res.forEach(({ id, name }) => {
-                    choiceArray.push(id + " " + name);
-                });
-                return choiceArray;
-            }
+            {
+                name: "role",
+                type: "input",
+                message: "What is the title of this role?"
+            },
+            {
+                name: "salary",
+                type: "number",
+                message: "What is the salary for this role?"
+            },
+            {
+                name: "department",
+                type: "rawlist",
+                message: "What is the department for this role?",
+                choices () {
+                    const choiceArray = [];
+                    res.forEach(({ id, name }) => {
+                        choiceArray.push(id + " " + name);
+                    });
+                    return choiceArray;
+                }
         }]).then((answers) => {
             let newRole = {
                 title: answers.role,
