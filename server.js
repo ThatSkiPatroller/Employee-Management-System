@@ -9,7 +9,7 @@ const connection = mysql.createConnection({
     host: 'localhost',
     port: 3306,
     user: 'root',
-    password: '',
+    password: 'Tdragon9!',
     database: 'employees_db'
 });
 
@@ -142,8 +142,14 @@ const addDepartment = () => {
 };
 
 const addRole = () => {
+    // Need to select for id
+    const queryOne = 'SELECT id, name FROM employees_db.department';
+    connection.query(queryOne, (err, res) => {
+        if (err) throw err;
+    
     inquirer
-        .prompt({
+        .prompt([
+        {
             name: "role",
             type: "input",
             message: "What is the title of this role?"
@@ -155,23 +161,31 @@ const addRole = () => {
         },
         {
             name: "department",
-            type: "input",
-            message: "What is the department for this role?"
-        }).then((answers) => {
+            type: "rawlist",
+            message: "What is the department for this role?",
+            choices () {
+                const choiceArray = [];
+                res.forEach(({ id, name }) => {
+                    choiceArray.push(id + " " + name);
+                });
+                return choiceArray;
+            }
+        }]).then((answers) => {
             let newRole = {
                 title: answers.role,
                 salary: answers.salary,
-                department: answers.department
+                department: answers.department[0]
             };
-            const query = 'INSTER INTO role (title, salary, department_id) VALUES (?, ?, ?)';
-            connection.query(query, [ newRole.title, newRole.salary, newRole.department ], (res, err) => {
-                if (err) throw err;
+            const queryTwo = 'INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)';
+            connection.query(queryTwo, [ newRole.title, newRole.salary, newRole.department ], (res, err) => {
+                
                 console.log("New role added!");
-                console.log(res);
+                
             });
+            start();
         });
+    });
 };
-
 
 const getManagers = () => {
     return new Promise((resolve, reject) => {
