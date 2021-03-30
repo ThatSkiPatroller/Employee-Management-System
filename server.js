@@ -85,11 +85,11 @@ const viewAll = () => {
         if (err) throw err;
         console.table(res);
     });
-console.log('this is view all');
 start();
 };
 
 const byDep = () => {
+    const query = ''
     inquirer  
         .prompt({
             name: "department",
@@ -108,6 +108,7 @@ const byMngr = () => {
 };
 
 const addEmployee = () => {
+    // Need to get roles from employee_db.role and managers
     inquirer
         .prompt({
             name: "firstName",
@@ -123,17 +124,18 @@ const addEmployee = () => {
             name: "role",
             type: "list",
             message: "What is the employee's role?",
-            choices: [
-            "Sales lead", "Salesperson", "Lead Engineer", "Software Engineer", 
-            "Account Manager", "Accountant", "Legal Team Lead"
-        ]
+            roleChoices () {
+
+            }
         },
         {
             name: "employeeMngr",
             type: "list",
             message: "Who is the emplyee's manager?",
-            // Need to get managers from employees_db for choices
-            choices: []
+            
+            mngrChoices () {
+
+            }
         })
 };
 
@@ -198,7 +200,7 @@ const addRole = () => {
             start();
         });
     });
-};
+}; 
 
 const getManagers = () => {
     return new Promise((resolve, reject) => {
@@ -217,7 +219,7 @@ const getEmployees = () => {
 
 }
 
-const remEmployee = async () => {
+const remEmployee = async  () => {
     let choices = await employees_db.getEmployees();
     console.log(choices);
     inquirer
@@ -239,15 +241,51 @@ const remEmployee = async () => {
 };
 
 const upEmployee = () => {
+    connection.query(`SELECT e.first_name, e.last_name, e.id AS employee_id, r.title, r.id AS role_id, d.name
+    FROM employee e
+    LEFT JOIN employee em ON e.manager_id = em.id
+    INNER JOIN role r ON e.role_id = r.id
+    INNER JOIN department d ON r.department_id = d.id
+    ORDER BY r.id`, function (err,res) {
+        if (err) throw err;
+        console.table(res);
+
     inquirer
-        .prompt({
+        .prompt([{
             name: "updateEmployee",
             type: "list",
-            message: "Which employee do you want to update?",
             // Need to get employees for choices
-            choices: []
+            choices: function () {
+                var employees = [];
+                for (var i = 0; i<res.length; i++) {
+                    employees.push(res[i].last_name);
+                }
+                return employees;
+            },
+           message: "Which employee's role do you want to update?",
+        },
+        {
+            name: "updateRole",
+            type: "list",
+            choices: function () {
+                var employeeRoles = [];
+                for (var i=0; i < res.length; i++) {
+                    employeeRoles.push(res[i].role_id);
+                }
+                var duplicates = new Set(employeeRoles)
+                var newArr = [...duplicates];
+                return newArr;
+            },
+            message: "What role do you want to change it to?",
+        }]).then(function (answer) {
+            connection.query(`UPDATE employee SET ?
+            WHERE last_name = "${answer.updateEmployee}"`, { role_id: answer.updateRole }, function (res, err) {
+                
+                console.log("New employee role has been updated!")
+                start();
+            })
         })
-    console.log('this is upEmployee');
+})
 };
 
 const upMngr = () => {
