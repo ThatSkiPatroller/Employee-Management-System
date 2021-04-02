@@ -26,21 +26,21 @@ const start = () => {
             type: "rawlist",
             message: "What would you like to do?",
             choices: [
-            "View All Employees", "View All Employees By Department", 
-            "View All Employees By Manager", "Add Employee", "Add Department", "Add Role", "Remove Employee", 
+            "View All Employees", "View All Departments", 
+            "View All Managers", "Add Employee", "Add Department", "Add Role", "Remove Employee", 
             "Update Employee Role", "Update Employee Manager"]
         })
         .then((answer) => {
             switch (answer.toDo) {
                 case "View All Employees":
-                    viewAll();
+                    viewAll("employee");
                     break;
 
-                case "View All Employees By Department":
+                case "View All Departments":
                     byDep();
                     break;
 
-                case "View All Employees By Manager":
+                case "View All Managers":
                     byMngr();
                     break;
 
@@ -56,17 +56,17 @@ const start = () => {
                     addRole();
                     break;
 
-                case "Remove Employee":
-                    remEmployee();
-                    break;
+                // case "Remove Employee":
+                //     remEmployee();
+                //     break;
 
                 case "Update Employee Role":
                     upEmployee();
                     break;
 
-                case "Update Employee Manager":
-                    upMngr();
-                    break;
+                // case "Update Employee Manager":
+                //     upMngr();
+                //     break;
 
                 default:
                     console.log(`Invalid action: ${answer.toDo}`);
@@ -78,9 +78,11 @@ const start = () => {
 };
 
 // Need console.table for view all
-const viewAll = () => {
+
+
+const viewAll = (tableName) => {
     const query =
-    'SELECT * FROM employee';
+    `SELECT * FROM ${tableName}`;
     connection.query(query, (err, res) => {
         if (err) throw err;
         console.table(res);
@@ -89,16 +91,8 @@ start();
 };
 
 const byDep = () => {
-    const query = ''
-    inquirer  
-        .prompt({
-            name: "department",
-            type: "list",
-            message: "What department are you looking for?",
-            choices: ["Sales", "Engineering", "Finance", "Legal"]
-        }).then((answer) => {
-            
-        });
+    console.log("this is byDep");
+    viewAll('department');
     start();
 };
 
@@ -109,6 +103,7 @@ const byMngr = () => {
 
 const addEmployee = () => {
     // Need to get roles from employee_db.role and managers
+    const query = 'SELECT '
     inquirer
         .prompt({
             name: "firstName",
@@ -125,7 +120,8 @@ const addEmployee = () => {
             type: "list",
             message: "What is the employee's role?",
             roleChoices () {
-
+                const choiceArray = [];
+                 
             }
         },
         {
