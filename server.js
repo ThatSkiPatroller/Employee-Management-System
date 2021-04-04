@@ -103,9 +103,13 @@ const byMngr = () => {
 
 const addEmployee = () => {
     // Need to get roles from employee_db.role and managers
-    const query = 'SELECT '
+    const query = 'SELECT id, title FROM employees_db.role';
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+   
     inquirer
-        .prompt({
+        .prompt([
+        {
             name: "firstName",
             type: "input",
             message: "What is the employee's first name?",
@@ -117,22 +121,35 @@ const addEmployee = () => {
         },
         {
             name: "role",
-            type: "list",
+            type: "rawlist",
             message: "What is the employee's role?",
-            roleChoices () {
+            choices () {
                 const choiceArray = [];
-                 
+                res.forEach(({ id, title}) => {
+                    choiceArray.push(id + " " + title);
+                });
+                return choiceArray;
             }
         },
         {
             name: "employeeMngr",
-            type: "list",
-            message: "Who is the emplyee's manager?",
-            
-            mngrChoices () {
-
-            }
+            type: "input",
+            message: "What is the employee manager id?"
+        }
+    ]).then((answers) => {
+        let newEmp = {
+            first_name: answers.firstName,
+            last_name: answers.lastName,
+            role_id: answers.role[0],
+            manager_id: answers.employeeMngr
+        };
+        const queryTwo = 'INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)';
+        connection.query(queryTwo, [newEmp.first_name, newEmp.last_name, newEmp.role_id, newEmp.manager_id], (res, err) => {
+            console.log("New employee added!");
         })
+        start();
+    });
+    });
 };
 
 const addDepartment = () => {
